@@ -2,17 +2,21 @@ import { useState, useEffect, useRef } from 'react';
 import Form from './form/form';
 import Contacts from './contacts/contacts';
 import Filter from './filter/filter';
-import { nanoid } from 'nanoid';
+import { useSelector, useDispatch } from 'react-redux';
+import { addNumber } from 'redux/action';
 
 const App = () => {
-  const [contacts, setContacts] = useState([]);
   const [filter, setFilter] = useState('');
   const isFirstRender = useRef(true);
 
+  let contacts = useSelector(state => state.contacts);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     let savedContacts = localStorage.getItem('Contacts');
+    let parsedData = JSON.parse(savedContacts);
     if (savedContacts) {
-      setContacts(JSON.parse(savedContacts));
+      // dispatch(addNumber());
     }
   }, []);
 
@@ -29,38 +33,13 @@ const App = () => {
     setFilter(event.target.value);
   };
 
-  const handleSubmitForm = data => {
-    let contactExists = false;
-    contacts.forEach(contact => {
-      if (contact.name.toLowerCase() === data.name.toLowerCase()) {
-        contactExists = true;
-        alert('This contact is already in your list');
-      }
-    });
-    if (!contactExists) {
-      const { name, number } = data;
-      const newContact = { id: nanoid(), name, number };
-      setContacts(prevContacts => [...prevContacts, newContact]);
-    }
-  };
-
-  const deleteContactHandler = contactId => {
-    setContacts(prevContacts =>
-      prevContacts.filter(contact => contact.id !== contactId)
-    );
-  };
-
-  const normalizedFilter = filter.toLowerCase();
-  const filteredList = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(normalizedFilter)
-  );
   return (
     <>
       <h1>Phonebook</h1>
-      <Form handleSubmitForm={handleSubmitForm} />
+      <Form />
       <h2>Contacts</h2>
       <Filter value={filter} onChange={handleInputChange} />
-      <Contacts data={filteredList} onDelete={deleteContactHandler} />
+      <Contacts data={contacts} />
     </>
   );
 };

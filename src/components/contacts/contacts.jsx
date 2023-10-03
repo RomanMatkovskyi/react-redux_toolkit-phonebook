@@ -1,22 +1,34 @@
 import s from './contacts.module.css';
+import { useSelector, useDispatch } from 'react-redux';
+import { deleteNumber } from 'redux/contactSlice';
 import PropTypes from 'prop-types';
 
-const Contacts = ({ data, onDelete }) => {
+const Contacts = () => {
+  const value = useSelector(state => state.contacts);
+  const filter = useSelector(state => state.filter);
+  const dispatch = useDispatch();
+  const deleteContact = id => dispatch(deleteNumber(id));
+
+  const normalizedFilter = filter.toLowerCase();
+  const filteredList = value.filter(contact =>
+    contact.nickname.toLowerCase().includes(normalizedFilter)
+  );
+
   return (
     <>
-      {data.length === 0 ? (
+      {value.length === 0 ? (
         <p className={s.nocontacts}>No contacts found</p>
       ) : (
         <ul className={s.contactlist}>
-          {data.map(({ id, name, number }) => (
+          {filteredList.map(({ id, nickname, number }) => (
             <li key={id} id={id} className={s.contactitem}>
               <p>
-                {name}: {number}
+                {nickname}: {number}
               </p>
               <button
                 type="button"
                 className={s.deletebutton}
-                onClick={() => onDelete(id)}
+                onClick={() => deleteContact(id)}
               >
                 x
               </button>

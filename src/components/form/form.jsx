@@ -1,59 +1,60 @@
-import { useState } from 'react';
 import s from './form.module.css';
 import PropTypes from 'prop-types';
 
-const Form = ({ handleSubmitForm }) => {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+import { useDispatch, useSelector } from 'react-redux';
+import { addNumber } from 'redux/contactSlice';
 
-  const handleInputChange = event => {
-    switch (event.target.name) {
-      case 'name':
-        setName(event.target.value);
-        break;
-      case 'number':
-        setNumber(event.target.value);
-        break;
-      default:
-        return;
-    }
-  };
+const Form = () => {
+  const dispatch = useDispatch();
+
+  const contacts = useSelector(state => state.contacts);
 
   const submitForm = event => {
     event.preventDefault();
 
-    handleSubmitForm({ name, number });
-    setName('');
-    setNumber('');
+    let contactExists = false;
+    const form = event.target;
+    let nickname = form.elements.name.value;
+    let number = form.elements.number.value;
+
+    contacts.forEach(contact => {
+      if (contact.nickname.toLowerCase() === nickname.toLowerCase()) {
+        contactExists = true;
+        alert('This contact is already in your list');
+      }
+    });
+    if (!contactExists) {
+      dispatch(addNumber(nickname, number));
+    }
+
+    form.reset();
   };
 
   return (
-    <form onSubmit={submitForm} className={s.form}>
-      <label htmlFor="nameInput" className={s.nameinput}>
-        Name
-      </label>
-      <input
-        type="text"
-        name="name"
-        value={name}
-        title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-        required
-        onChange={handleInputChange}
-      />
-      <label htmlFor="phoneInput">Number</label>
-      <input
-        type="tel"
-        name="number"
-        id="phoneInput"
-        onChange={handleInputChange}
-        value={number}
-        title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-        required
-      />
-      <button type="submit" className={s.addbutton}>
-        Add contact
-      </button>
-    </form>
+    <>
+      <form onSubmit={submitForm} className={s.form}>
+        <label htmlFor="nameInput" className={s.nameinput}>
+          Name
+        </label>
+        <input
+          type="text"
+          name="name"
+          title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
+          required
+        />
+        <label htmlFor="phoneInput">Number</label>
+        <input
+          type="tel"
+          name="number"
+          id="phoneInput"
+          title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
+          required
+        />
+        <button type="submit" className={s.addbutton}>
+          Add contact
+        </button>
+      </form>
+    </>
   );
 };
 
