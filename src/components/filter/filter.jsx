@@ -5,8 +5,7 @@ import { filterContacts } from 'redux/filterSlice';
 
 const Filter = () => {
   const dispatch = useDispatch();
-  const state = useSelector(state => state);
-  const filter = useSelector(state => state.filter);
+
   return (
     <>
       <p className={s.filtertitle}>Find contacts by name</p>
